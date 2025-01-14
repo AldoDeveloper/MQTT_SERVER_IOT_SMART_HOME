@@ -1,22 +1,21 @@
-import * as net from 'net';
-import Aedes from 'aedes';
+import TcpServer from './server/tcp';
+import EnvConfig from './config/config';
+import WebsocketServer from './server/ws';
 
-const PORT = 1883;
+const PORT_TCP = 8501;
+const HOST_TCP = "0.0.0.0";
 
-const aedes = new Aedes({});
+const PORT_WS = 8502;
+const HOST_WS = "0.0.0.0";
+
+EnvConfig();
 
 async function bootraps() {
-
-    const server = net.createServer(aedes.handle);
     
-    server.listen(PORT, "0.0.0.0", () => {
-        console.log("mqtt server is run!")
-    });
-
-    process.on("SIGINT", () => {
-        console.log("Server Close!")
-        server.close();
-    })
+    Promise.allSettled([
+        TcpServer(PORT_TCP, HOST_TCP),
+        WebsocketServer(PORT_WS, HOST_WS)
+    ])
 }
 
 bootraps();
